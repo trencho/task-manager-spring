@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: task-manager
+  data:
+    mongodb:
+      uri: mongodb://admin:admin123@localhost:27017/task-manager?authMechanism=SCRAM-SHA-256
+
+jwt:
+  secret: your_jwt_secret_key
+  expiration: 3600000
+
+server:
+  port: 8080
+
+logging:
+  level:
+    root: DEBUG
+  file:
+    name: application.log

@@ -1,0 +1,31 @@
+services:
+  spring:
+    build:
+      dockerfile: docker/java/Dockerfile
+    container_name: spring
+    depends_on:
+      - mongo
+    deploy:
+      replicas: 1
+    expose:
+      - 8080
+    image: task-manager-spring:latest
+    ports:
+      - "8080:8080"
+
+  mongo:
+    build:
+      dockerfile: docker/mongo/Dockerfile
+    container_name: mongo
+    deploy:
+      replicas: 1
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+    expose:
+      - 27017
+    image: task-manager-mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./docker/mongo/init/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
