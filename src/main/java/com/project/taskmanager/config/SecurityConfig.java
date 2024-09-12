@@ -45,7 +45,8 @@ public class SecurityConfig {
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, customUserDetailsService),
                         UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement(sessionManagementCustomizer -> sessionManagementCustomizer
-                        .sessionCreationPolicy(SessionCreationPolicy.NEVER))
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .httpBasic(AbstractHttpConfigurer::disable)
         // ... add other configurations like authentication providers, etc.
         ;
         return http.build();
