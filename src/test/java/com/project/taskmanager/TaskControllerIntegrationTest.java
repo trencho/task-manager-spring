@@ -1,13 +1,8 @@
 package com.project.taskmanager;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.List;
-
+import com.project.taskmanager.config.MongoTestContainerConfig;
+import com.project.taskmanager.model.Task;
+import com.project.taskmanager.repository.TaskRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +13,13 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.MongoDBContainer;
 
-import com.project.taskmanager.config.MongoTestContainerConfig;
-import com.project.taskmanager.model.Task;
-import com.project.taskmanager.repository.TaskRepository;
+import java.util.List;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
 @ContextConfiguration(classes = MongoTestContainerConfig.class)
@@ -49,8 +48,8 @@ class TaskControllerIntegrationTest {
         final var newTaskJson = "{\"title\":\"Test Task\",\"description\":\"Test Description\"}";
 
         mockMvc.perform(post("/api/tasks")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(newTaskJson))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(newTaskJson))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title").value("Test Task"));
     }
