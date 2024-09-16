@@ -1,5 +1,7 @@
 package com.project.taskmanager.controller;
 
+import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,7 +27,7 @@ public class AuthController {
     private final JwtTokenProvider tokenProvider;
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody final User user) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody final User user) {
         try {
             userService.registerUser(user);
             return ResponseEntity.ok("User registered successfully!");
@@ -35,7 +37,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@RequestBody final User user) {
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody final User user) {
         final var authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
 

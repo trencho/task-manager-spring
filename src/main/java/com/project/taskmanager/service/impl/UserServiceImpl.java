@@ -20,9 +20,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User registerUser(final User user) {
-        if (userRepository.findByEmail(user.getEmail()).isPresent() ||
-                userRepository.findByUsername(user.getUsername()).isPresent()) {
-            throw new IllegalArgumentException("User with the same email or username already exists");
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+            throw new IllegalArgumentException("User with the same username already exists");
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -33,11 +32,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<User> findByUsername(final String username) {
         return userRepository.findByUsername(username);
-    }
-
-    @Override
-    public Optional<User> findByEmail(final String email) {
-        return userRepository.findByEmail(email);
     }
 
     @Override
