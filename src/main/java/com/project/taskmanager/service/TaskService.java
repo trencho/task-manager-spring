@@ -14,6 +14,6 @@ public interface TaskService {
 
     Task updateTask(String id, Task task);
 
-    boolean deleteTask(String id);
+    void deleteTask(String id);
 
 }

@@ -3,7 +3,9 @@ spring:
     name: task-manager
   data:
     mongodb:
-      uri: mongodb://admin:admin123@localhost:27017/task-manager?authMechanism=SCRAM-SHA-256
+      uri: mongodb://admin:password@localhost:27017/task-manager?authMechanism=SCRAM-SHA-256
+      database: task-manager
+      authentication-database: task-manager
 
 jwt:
   secret: your_jwt_secret_key

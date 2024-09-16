@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.project.taskmanager.exception.TaskNotFoundException;
 import com.project.taskmanager.model.Task;
 import com.project.taskmanager.repository.TaskRepository;
 import com.project.taskmanager.service.TaskService;
@@ -46,12 +47,12 @@ public class TaskServiceImpl implements TaskService {
             return taskRepository.save(taskToUpdate);
         }
 
-        return null;
+        throw new TaskNotFoundException("Task not found with id: " + id);
     }
 
     @Override
-    public boolean deleteTask(final String id) {
-        return false;
+    public void deleteTask(final String id) {
+        taskRepository.deleteById(id);
     }
 
 }
