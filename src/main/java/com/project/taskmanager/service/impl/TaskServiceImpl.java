@@ -1,16 +1,14 @@
 package com.project.taskmanager.service.impl;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.stereotype.Service;
-
 import com.project.taskmanager.exception.TaskNotFoundException;
 import com.project.taskmanager.model.Task;
 import com.project.taskmanager.repository.TaskRepository;
 import com.project.taskmanager.service.TaskService;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -24,14 +22,14 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Task getTaskById(final String id) {
-        Optional<Task> task = taskRepository.findById(id);
-        return task.orElse(null);
+    public Task createTask(final Task task) {
+        return taskRepository.save(task);
     }
 
     @Override
-    public Task createTask(final Task task) {
-        return taskRepository.save(task);
+    public Task getTaskById(final String id) {
+        Optional<Task> task = taskRepository.findById(id);
+        return task.orElse(null);
     }
 
     @Override

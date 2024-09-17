@@ -1,5 +1,18 @@
 package com.project.taskmanager;
 
+import com.project.taskmanager.exception.TaskNotFoundException;
+import com.project.taskmanager.model.Task;
+import com.project.taskmanager.repository.TaskRepository;
+import com.project.taskmanager.service.impl.TaskServiceImpl;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import java.util.List;
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -10,20 +23,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import java.util.List;
-import java.util.Optional;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
-import com.project.taskmanager.exception.TaskNotFoundException;
-import com.project.taskmanager.model.Task;
-import com.project.taskmanager.repository.TaskRepository;
-import com.project.taskmanager.service.impl.TaskServiceImpl;
 
 class TaskServiceImplTest {
 
@@ -49,18 +48,6 @@ class TaskServiceImplTest {
     }
 
     @Test
-    void testGetTaskById() {
-        final var task = new Task("Test Task", "Test Description", false, "testUser");
-        when(taskRepository.findById("1")).thenReturn(Optional.of(task));
-
-        final var foundTask = taskService.getTaskById("1");
-        assertNotNull(foundTask);
-        assertEquals("Test Task", foundTask.getTitle());
-
-        verify(taskRepository, times(1)).findById("1");
-    }
-
-    @Test
     void testCreateTask() {
         final var task = new Task("Test Task", "Test Description", false, "testUser");
 
@@ -71,6 +58,18 @@ class TaskServiceImplTest {
         assertEquals("Test Task", createdTask.getTitle());
 
         verify(taskRepository, times(1)).save(task);
+    }
+
+    @Test
+    void testGetTaskById() {
+        final var task = new Task("Test Task", "Test Description", false, "testUser");
+        when(taskRepository.findById("1")).thenReturn(Optional.of(task));
+
+        final var foundTask = taskService.getTaskById("1");
+        assertNotNull(foundTask);
+        assertEquals("Test Task", foundTask.getTitle());
+
+        verify(taskRepository, times(1)).findById("1");
     }
 
     @Test

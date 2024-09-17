@@ -1,9 +1,10 @@
 package com.project.taskmanager.security;
 
-import java.util.Date;
-
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.HttpServletRequest;
-
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -11,12 +12,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import lombok.RequiredArgsConstructor;
+import java.util.Date;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtTokenProvider {
 
     @Value("${jwt.secret}")
@@ -33,9 +33,9 @@ public class JwtTokenProvider {
         final var validity = new Date(now.getTime() + jwtExpirationMs);
 
         return Jwts.builder()
-                .setSubject(userDetails.getUsername())
-                .setIssuedAt(now)
-                .setExpiration(validity)
+                .subject(userDetails.getUsername())
+                .issuedAt(now)
+                .expiration(validity)
                 .signWith(SignatureAlgorithm.HS256, jwtSecret)
                 .compact();
     }
@@ -46,15 +46,15 @@ public class JwtTokenProvider {
     }
 
     public String getUsername(final String token) {
-        return Jwts.parserBuilder().setSigningKey(jwtSecret).build().parseClaimsJws(token).getBody().getSubject();
+        return Jwts.parser().setSigningKey(jwtSecret).build().parseSignedClaims(token).getPayload().getSubject();
     }
 
     public boolean validateToken(final String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(jwtSecret).build().parseClaimsJws(token);
+            Jwts.parser().setSigningKey(jwtSecret).build().parseSignedClaims(token);
             return true;
         } catch (Exception e) {
-            // log errors
+            log.error(e.getMessage());
         }
         return false;
     }

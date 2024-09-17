@@ -1,13 +1,12 @@
 package com.project.taskmanager.security;
 
-import java.util.Collection;
-import java.util.stream.Collectors;
-
+import com.project.taskmanager.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.project.taskmanager.model.User;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 /**
  * @param user Additional method to access an original User object
