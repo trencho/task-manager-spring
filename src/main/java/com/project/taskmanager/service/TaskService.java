@@ -1,19 +1,19 @@
 package com.project.taskmanager.service;
 
-import com.project.taskmanager.model.Task;
-
 import java.util.List;
+
+import com.project.taskmanager.model.Task;
 
 public interface TaskService {
 
-    List<Task> getAllTasks();
+    List<Task> getAllTasks(String userId);
 
-    Task createTask(Task task);
+    Task createTask(String userId, Task task);
 
-    Task getTaskById(String id);
+    Task getTaskById(String userId, String id);
 
-    Task updateTask(String id, Task task);
+    Task updateTask(String userId, String id, Task task);
 
-    void deleteTask(String id);
+    void deleteTask(String userId, String id);
 
 }

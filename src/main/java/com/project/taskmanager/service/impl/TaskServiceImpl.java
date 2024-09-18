@@ -1,56 +1,71 @@
 package com.project.taskmanager.service.impl;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import com.project.taskmanager.exception.TaskNotFoundException;
 import com.project.taskmanager.model.Task;
 import com.project.taskmanager.repository.TaskRepository;
 import com.project.taskmanager.service.TaskService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
 public class TaskServiceImpl implements TaskService {
 
+    private static final String TASK_NOT_FOUND_WITH_ID = "Task not found with id: ";
+    private static final String TASK_NOT_FOUND_FOR_USER = "Task not found for user: ";
+
     private final TaskRepository taskRepository;
 
     @Override
-    public List<Task> getAllTasks() {
-        return taskRepository.findAll();
+    public List<Task> getAllTasks(final String userId) {
+        return taskRepository.findByUserId(userId);
     }
 
     @Override
-    public Task createTask(final Task task) {
+    public Task createTask(final String userId, final Task task) {
         return taskRepository.save(task);
     }
 
     @Override
-    public Task getTaskById(final String id) {
-        Optional<Task> task = taskRepository.findById(id);
-        return task.orElse(null);
-    }
-
-    @Override
-    public Task updateTask(final String id, final Task task) {
-        Optional<Task> existingTask = taskRepository.findById(id);
-
-        if (existingTask.isPresent()) {
-            Task taskToUpdate = existingTask.get();
-            taskToUpdate.setTitle(task.getTitle());
-            taskToUpdate.setDescription(task.getDescription());
-            taskToUpdate.setCompleted(task.isCompleted());
-
-            return taskRepository.save(taskToUpdate);
+    public Task getTaskById(final String userId, final String id) {
+        final var task = taskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException(TASK_NOT_FOUND_WITH_ID + id));
+        if (task.getUser().getUsername().equals(userId)) {
+            return task;
         }
 
-        throw new TaskNotFoundException("Task not found with id: " + id);
+        throw new TaskNotFoundException(TASK_NOT_FOUND_FOR_USER + userId);
     }
 
     @Override
-    public void deleteTask(final String id) {
-        taskRepository.deleteById(id);
+    public Task updateTask(final String userId, final String id, final Task task) {
+        final var existingTask = taskRepository.findById(id)
+                .orElseThrow(() -> new TaskNotFoundException(TASK_NOT_FOUND_WITH_ID + id));
+
+        if (existingTask.getUser().getUsername().equals(userId)) {
+            existingTask.setTitle(task.getTitle());
+            existingTask.setDescription(task.getDescription());
+            existingTask.setCompleted(task.isCompleted());
+
+            return taskRepository.save(existingTask);
+        }
+
+        throw new TaskNotFoundException(TASK_NOT_FOUND_FOR_USER + userId);
+    }
+
+    @Override
+    public void deleteTask(final String userId, final String id) {
+        final var existingTask = taskRepository.findById(id)
+                .orElseThrow(() -> new TaskNotFoundException(TASK_NOT_FOUND_WITH_ID + id));
+        if (existingTask.getUser().getUsername().equals(userId)) {
+            taskRepository.deleteById(id);
+            return;
+        }
+
+        throw new TaskNotFoundException(TASK_NOT_FOUND_FOR_USER + userId);
     }
 
 }

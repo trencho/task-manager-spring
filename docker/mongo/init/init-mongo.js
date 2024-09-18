@@ -13,8 +13,8 @@ db.createUser({
 });
 
 db.createUser({
-    user: "testUser",
-    pwd: "password123", // replace with your password
+    user: "username",
+    pwd: "password", // replace with your password
     roles: [
         {
             role: "readWrite",
@@ -27,8 +27,8 @@ db.createUser({
 // Create a "users" collection and insert a sample user
 db.createCollection("users");
 db.users.insertOne({
-    username: "testUser",
-    password: "password123",
+    username: "username",
+    password: "password",
     roles: ["USER"]
 });
 
