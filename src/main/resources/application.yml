@@ -12,10 +12,8 @@ jwt:
   expiration: 3600000
 
 server:
-  port: 8080
+  port: 80
 
 logging:
   level:
     root: DEBUG
-  file:
-    name: application.log
