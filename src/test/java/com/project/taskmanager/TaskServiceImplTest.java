@@ -2,6 +2,7 @@ package com.project.taskmanager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -11,6 +12,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,9 +22,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import com.project.taskmanager.entity.Task;
+import com.project.taskmanager.entity.User;
+import com.project.taskmanager.enums.TaskStatus;
 import com.project.taskmanager.exception.TaskNotFoundException;
-import com.project.taskmanager.model.Task;
-import com.project.taskmanager.model.User;
 import com.project.taskmanager.repository.TaskRepository;
 import com.project.taskmanager.service.impl.TaskServiceImpl;
 
@@ -58,7 +61,7 @@ class TaskServiceImplTest {
 
     @Test
     void testCreateTask() {
-        final var task = new Task("Test Task", "Test Description", false, user);
+        final var task = new Task("Test Task", "Test Description", LocalDate.now(), TaskStatus.PENDING, user);
 
         when(taskRepository.save(task)).thenReturn(task);
 
@@ -71,7 +74,7 @@ class TaskServiceImplTest {
 
     @Test
     void testGetTaskByIdSuccessful() {
-        final var task = new Task("Test Task", "Test Description", false, user);
+        final var task = new Task("Test Task", "Test Description", LocalDate.now(), TaskStatus.PENDING, user);
         when(taskRepository.findById("1")).thenReturn(Optional.of(task));
 
         final var foundTask = taskService.getTaskById("username", "1");
@@ -93,8 +96,8 @@ class TaskServiceImplTest {
     @Test
     void testUpdateTaskSuccessful() {
         final var taskId = "1";
-        final var existingTask = new Task("Old Title", "Old Description", false, user);
-        final var updatedTask = new Task("New Title", "New Description", true, user);
+        final var existingTask = new Task("Old Title", "Old Description", LocalDate.now(), TaskStatus.PENDING, user);
+        final var updatedTask = new Task("New Title", "New Description", LocalDate.now(), TaskStatus.COMPLETED, user);
 
         when(taskRepository.findById(taskId)).thenReturn(Optional.of(existingTask));
         when(taskRepository.save(existingTask)).thenReturn(existingTask);
@@ -104,7 +107,7 @@ class TaskServiceImplTest {
         assertNotNull(result);
         assertEquals("New Title", result.getTitle());
         assertEquals("New Description", result.getDescription());
-        assertTrue(result.isCompleted());
+        assertSame(TaskStatus.COMPLETED, result.getStatus());
 
         verify(taskRepository, times(1)).save(existingTask);
     }
@@ -112,7 +115,7 @@ class TaskServiceImplTest {
     @Test
     void testUpdateTaskFailed() {
         final var taskId = "1";
-        final var updatedTask = new Task("New Title", "New Description", true, user);
+        final var updatedTask = new Task("New Title", "New Description", LocalDate.now(), TaskStatus.COMPLETED, user);
 
         when(taskRepository.findById(taskId)).thenReturn(Optional.empty());
 
@@ -123,7 +126,7 @@ class TaskServiceImplTest {
 
     @Test
     void testDeleteTask() {
-        final var task = new Task("Test Task", "Test Description", false, user);
+        final var task = new Task("Test Task", "Test Description", LocalDate.now(), TaskStatus.PENDING, user);
         when(taskRepository.findById("1")).thenReturn(Optional.of(task));
         doNothing().when(taskRepository).deleteById("1");
 

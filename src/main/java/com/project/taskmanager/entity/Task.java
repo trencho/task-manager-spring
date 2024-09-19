@@ -1,10 +1,12 @@
-package com.project.taskmanager.model;
+package com.project.taskmanager.entity;
 
-import jakarta.validation.constraints.NotBlank;
+import java.time.LocalDate;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import com.project.taskmanager.enums.TaskStatus;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,20 +23,23 @@ public class Task {
     @Id
     private String id;
 
-    @NotBlank
     private String title;
 
     private String description;
 
-    private boolean completed = false;
+    private LocalDate dueDate;
+
+    private TaskStatus status;
 
     @DBRef
     private User user;
 
-    public Task(final String title, final String description, final boolean completed, final User user) {
+    public Task(final String title, final String description, final LocalDate dueDate, final TaskStatus status,
+                final User user) {
         this.title = title;
         this.description = description;
-        this.completed = completed;
+        this.dueDate = dueDate;
+        this.status = status;
         this.user = user;
     }
 

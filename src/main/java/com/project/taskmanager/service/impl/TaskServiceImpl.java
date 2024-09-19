@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.project.taskmanager.entity.Task;
 import com.project.taskmanager.exception.TaskNotFoundException;
-import com.project.taskmanager.model.Task;
 import com.project.taskmanager.repository.TaskRepository;
 import com.project.taskmanager.service.TaskService;
 
@@ -48,7 +48,8 @@ public class TaskServiceImpl implements TaskService {
         if (existingTask.getUser().getUsername().equals(userId)) {
             existingTask.setTitle(task.getTitle());
             existingTask.setDescription(task.getDescription());
-            existingTask.setCompleted(task.isCompleted());
+            existingTask.setDueDate(task.getDueDate());
+            existingTask.setStatus(task.getStatus());
 
             return taskRepository.save(existingTask);
         }

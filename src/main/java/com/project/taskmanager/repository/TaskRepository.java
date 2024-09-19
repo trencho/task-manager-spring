@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import com.project.taskmanager.model.Task;
+import com.project.taskmanager.entity.Task;
 
 public interface TaskRepository extends MongoRepository<Task, String> {
 

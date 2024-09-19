@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import com.project.taskmanager.model.User;
+import com.project.taskmanager.entity.User;
 
 public interface UserRepository extends MongoRepository<User, String> {
 

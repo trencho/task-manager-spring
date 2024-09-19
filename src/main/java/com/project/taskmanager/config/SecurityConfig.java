@@ -38,6 +38,12 @@ public class SecurityConfig {
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers("/api/auth/**").permitAll()
                         .anyRequest().authenticated())
+                .logout(logoutCustomizer -> logoutCustomizer
+                        .logoutUrl("/api/auth/logout")
+                        .logoutSuccessUrl("/api/auth/login?logout")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
+                        .permitAll())
                 .exceptionHandling(exceptionHandlingCustomizer -> exceptionHandlingCustomizer
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .authenticationProvider(authenticationProvider())
@@ -45,7 +51,6 @@ public class SecurityConfig {
                         UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement(sessionManagementCustomizer -> sessionManagementCustomizer
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .httpBasic(AbstractHttpConfigurer::disable)
                 .build();
     }
 

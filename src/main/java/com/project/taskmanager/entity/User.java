@@ -1,4 +1,4 @@
-package com.project.taskmanager.model;
+package com.project.taskmanager.entity;
 
 import java.util.Collection;
 import java.util.HashSet;

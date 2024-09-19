@@ -8,6 +8,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDate;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -20,8 +22,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.project.taskmanager.config.MongoTestContainerConfig;
-import com.project.taskmanager.model.Task;
-import com.project.taskmanager.model.User;
+import com.project.taskmanager.entity.Task;
+import com.project.taskmanager.entity.User;
+import com.project.taskmanager.enums.TaskStatus;
 import com.project.taskmanager.repository.TaskRepository;
 import com.project.taskmanager.repository.UserRepository;
 
@@ -59,14 +62,16 @@ class TaskControllerIntegrationTest {
         task = new Task();
         task.setTitle("Initial Task Title");
         task.setDescription("Initial Task Description");
+        task.setDueDate(LocalDate.now());
+        task.setStatus(TaskStatus.PENDING);
         task.setUser(user);
         taskRepository.save(task);
     }
 
     private String createTask(final String jsonPayload) throws Exception {
         return mockMvc.perform(post(BASE_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonPayload))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonPayload))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.title").value("New Task Title"))
                 .andExpect(jsonPath("$.description").value("New Task Description"))
@@ -79,8 +84,8 @@ class TaskControllerIntegrationTest {
     @Test
     @WithMockUser(username = "username")
     void testGetAllTasks() throws Exception {
-        final var task1 = new Task("Task 1", "Description 1", false, user);
-        final var task2 = new Task("Task 2", "Description 2", true, user);
+        final var task1 = new Task("Task 1", "Description 1", LocalDate.now(), TaskStatus.PENDING, user);
+        final var task2 = new Task("Task 2", "Description 2", LocalDate.now(), TaskStatus.COMPLETED, user);
         taskRepository.save(task1);
         taskRepository.save(task2);
 

@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.project.taskmanager.model.Task;
+import com.project.taskmanager.dto.TaskDTO;
+import com.project.taskmanager.entity.Task;
+import com.project.taskmanager.mapper.TaskMapper;
 import com.project.taskmanager.service.TaskService;
 
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,8 @@ public class TaskController {
 
     private final TaskService taskService;
 
+    private final TaskMapper taskMapper;
+
     @GetMapping
     public ResponseEntity<List<Task>> getAllTasks(final Authentication authentication) {
         final var principal = (User) authentication.getPrincipal();
@@ -40,31 +44,33 @@ public class TaskController {
 
     @PostMapping
     public ResponseEntity<Task> createTask(final Authentication authentication,
-            @Valid @RequestBody final Task task) throws URISyntaxException {
+            @Valid @RequestBody final TaskDTO taskDTO) throws URISyntaxException {
         final var principal = (User) authentication.getPrincipal();
         final var userId = principal.getUsername();
 
-        final var createdTask = taskService.createTask(userId, task);
+        final var createdTask = taskService.createTask(userId, taskMapper.toEntity(taskDTO));
         final var location = new URI("/api/tasks/" + createdTask.getId());
 
         return ResponseEntity.created(location).body(createdTask);
     }
 
     @GetMapping("/{taskId}")
-    public ResponseEntity<Task> getTask(final Authentication authentication, @PathVariable final String taskId) {
+    public ResponseEntity<TaskDTO> getTask(final Authentication authentication, @PathVariable final String taskId) {
         final var principal = (User) authentication.getPrincipal();
         final var userId = principal.getUsername();
 
-        return ResponseEntity.ok(taskService.getTaskById(userId, taskId));
+        final var task = taskService.getTaskById(userId, taskId);
+        return ResponseEntity.ok(taskMapper.toDTO(task));
     }
 
     @PutMapping("/{taskId}")
-    public ResponseEntity<Task> updateTask(final Authentication authentication, @PathVariable final String taskId,
-            @RequestBody final Task task) {
+    public ResponseEntity<TaskDTO> updateTask(final Authentication authentication, @PathVariable final String taskId,
+            @RequestBody final TaskDTO taskDTO) {
         final var principal = (User) authentication.getPrincipal();
         final var userId = principal.getUsername();
 
-        return ResponseEntity.ok(taskService.updateTask(userId, taskId, task));
+        final var task = taskService.updateTask(userId, taskId, taskMapper.toEntity(taskDTO));
+        return ResponseEntity.ok(taskMapper.toDTO(task));
     }
 
     @DeleteMapping("/{taskId}")

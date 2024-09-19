@@ -2,7 +2,7 @@ package com.project.taskmanager.service;
 
 import java.util.List;
 
-import com.project.taskmanager.model.Task;
+import com.project.taskmanager.entity.Task;
 
 public interface TaskService {
 
