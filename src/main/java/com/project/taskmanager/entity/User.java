@@ -1,11 +1,7 @@
 package com.project.taskmanager.entity;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
-import jakarta.validation.constraints.NotBlank;
-
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -13,8 +9,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import lombok.Getter;
-import lombok.Setter;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 @Document(collection = "users")
 @Getter
@@ -25,8 +22,9 @@ public class User implements UserDetails {
     private String id;
 
     @Indexed
-    @NotBlank(message = "Username is mandatory")
     private String username;
+
+    private String email;
 
     private String password;
 

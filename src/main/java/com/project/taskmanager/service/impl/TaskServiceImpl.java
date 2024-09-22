@@ -1,15 +1,13 @@
 package com.project.taskmanager.service.impl;
 
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-
 import com.project.taskmanager.entity.Task;
 import com.project.taskmanager.exception.TaskNotFoundException;
 import com.project.taskmanager.repository.TaskRepository;
 import com.project.taskmanager.service.TaskService;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -22,7 +20,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public List<Task> getAllTasks(final String userId) {
-        return taskRepository.findByUserId(userId);
+        return taskRepository.findByUsername(userId);
     }
 
     @Override
@@ -33,7 +31,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public Task getTaskById(final String userId, final String id) {
         final var task = taskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException(TASK_NOT_FOUND_WITH_ID + id));
-        if (task.getUser().getUsername().equals(userId)) {
+        if (task.getUsername().equals(userId)) {
             return task;
         }
 
@@ -45,7 +43,7 @@ public class TaskServiceImpl implements TaskService {
         final var existingTask = taskRepository.findById(id)
                 .orElseThrow(() -> new TaskNotFoundException(TASK_NOT_FOUND_WITH_ID + id));
 
-        if (existingTask.getUser().getUsername().equals(userId)) {
+        if (existingTask.getUsername().equals(userId)) {
             existingTask.setTitle(task.getTitle());
             existingTask.setDescription(task.getDescription());
             existingTask.setDueDate(task.getDueDate());
@@ -61,7 +59,7 @@ public class TaskServiceImpl implements TaskService {
     public void deleteTask(final String userId, final String id) {
         final var existingTask = taskRepository.findById(id)
                 .orElseThrow(() -> new TaskNotFoundException(TASK_NOT_FOUND_WITH_ID + id));
-        if (existingTask.getUser().getUsername().equals(userId)) {
+        if (existingTask.getUsername().equals(userId)) {
             taskRepository.deleteById(id);
             return;
         }

@@ -1,9 +1,10 @@
 package com.project.taskmanager.security;
 
-import java.util.Date;
-
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.HttpServletRequest;
-
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -11,23 +12,19 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Date;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class JwtTokenProvider {
 
+    private final UserDetailsService userDetailsService;
     @Value("${jwt.secret}")
     private String jwtSecret;
 
     @Value("${jwt.expiration}")
     private int jwtExpirationMs;
-
-    private final UserDetailsService userDetailsService;
 
     public String generateToken(final Authentication authentication) {
         final var userDetails = (UserDetails) authentication.getPrincipal();

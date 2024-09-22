@@ -1,17 +1,12 @@
 package com.project.taskmanager;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.time.LocalDate;
-
+import com.project.taskmanager.config.MongoTestContainerConfig;
+import com.project.taskmanager.entity.Task;
+import com.project.taskmanager.entity.User;
+import com.project.taskmanager.enums.TaskStatus;
+import com.project.taskmanager.repository.TaskRepository;
+import com.project.taskmanager.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -21,12 +16,15 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.project.taskmanager.config.MongoTestContainerConfig;
-import com.project.taskmanager.entity.Task;
-import com.project.taskmanager.entity.User;
-import com.project.taskmanager.enums.TaskStatus;
-import com.project.taskmanager.repository.TaskRepository;
-import com.project.taskmanager.repository.UserRepository;
+import java.time.LocalDate;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
 @ContextConfiguration(classes = MongoTestContainerConfig.class)
@@ -36,6 +34,7 @@ class TaskControllerIntegrationTest {
     private static final String BASE_URL = "/api/tasks";
     private static final String TASK_JSON = "{\"title\": \"New Task Title\", \"description\": \"New Task Description\"}";
     private static final String UPDATED_TASK_JSON = "{\"title\": \"Updated Task Title\", \"description\": \"Updated Task Description\"}";
+    private static final String USERNAME = "username";
 
     @Autowired
     private MockMvc mockMvc;
@@ -47,14 +46,13 @@ class TaskControllerIntegrationTest {
     private UserRepository userRepository;
 
     private Task task;
-    private User user;
 
     @BeforeEach
     void setUp() {
         taskRepository.deleteAll();
         userRepository.deleteAll();
 
-        user = new User();
+        final var user = new User();
         user.setUsername("username");
         user.setPassword("password");
         userRepository.save(user);
@@ -64,14 +62,30 @@ class TaskControllerIntegrationTest {
         task.setDescription("Initial Task Description");
         task.setDueDate(LocalDate.now());
         task.setStatus(TaskStatus.PENDING);
-        task.setUser(user);
+        task.setUsername(USERNAME);
         taskRepository.save(task);
     }
 
-    private String createTask(final String jsonPayload) throws Exception {
-        return mockMvc.perform(post(BASE_URL)
+    @Test
+    @WithMockUser(username = USERNAME)
+    void testGetAllTasks() throws Exception {
+        final var task1 = new Task("Task 1", "Description 1", LocalDate.now(), TaskStatus.PENDING, "username1");
+        taskRepository.save(task1);
+
+        mockMvc.perform(get(BASE_URL)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].title").value("Initial Task Title"))
+                .andExpect(jsonPath("$[0].description").value("Initial Task Description"));
+    }
+
+    @Test
+    @WithMockUser(username = USERNAME)
+    void testCreateTask() throws Exception {
+        mockMvc.perform(post(BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonPayload))
+                        .content(TASK_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.title").value("New Task Title"))
                 .andExpect(jsonPath("$.description").value("New Task Description"))
@@ -80,33 +94,8 @@ class TaskControllerIntegrationTest {
                 .getContentAsString();
     }
 
-    @Disabled
     @Test
-    @WithMockUser(username = "username")
-    void testGetAllTasks() throws Exception {
-        final var task1 = new Task("Task 1", "Description 1", LocalDate.now(), TaskStatus.PENDING, user);
-        final var task2 = new Task("Task 2", "Description 2", LocalDate.now(), TaskStatus.COMPLETED, user);
-        taskRepository.save(task1);
-        taskRepository.save(task2);
-
-        mockMvc.perform(get(BASE_URL)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].title").value("Task 1"))
-                .andExpect(jsonPath("$[0].description").value("Description 1"))
-                .andExpect(jsonPath("$[1].title").value("Task 2"))
-                .andExpect(jsonPath("$[1].description").value("Description 2"));
-    }
-
-    @Test
-    @WithMockUser(username = "username")
-    void testCreateTask() throws Exception {
-        createTask(TASK_JSON);
-    }
-
-    @Test
-    @WithMockUser(username = "username")
+    @WithMockUser(username = USERNAME)
     void testGetTaskSuccessful() throws Exception {
         mockMvc.perform(get(BASE_URL + "/{id}", task.getId())
                         .contentType(MediaType.APPLICATION_JSON))
@@ -124,7 +113,7 @@ class TaskControllerIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "username")
+    @WithMockUser(username = USERNAME)
     void testUpdateTaskSuccessful() throws Exception {
         mockMvc.perform(put(BASE_URL + "/{id}", task.getId())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -135,7 +124,7 @@ class TaskControllerIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "username1")
+    @WithMockUser(username = USERNAME)
     void testUpdateTaskFailedMissingTask() throws Exception {
         mockMvc.perform(put(BASE_URL + "/100")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -155,7 +144,7 @@ class TaskControllerIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "username")
+    @WithMockUser(username = USERNAME)
     void testDeleteTaskSuccessful() throws Exception {
         mockMvc.perform(delete(BASE_URL + "/{id}", task.getId())
                         .contentType(MediaType.APPLICATION_JSON))
@@ -163,7 +152,7 @@ class TaskControllerIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "username1")
+    @WithMockUser(username = USERNAME)
     void testDeleteTaskFailedMissingTask() throws Exception {
         mockMvc.perform(delete(BASE_URL + "/100")
                         .contentType(MediaType.APPLICATION_JSON))

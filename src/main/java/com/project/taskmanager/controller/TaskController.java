@@ -1,11 +1,11 @@
 package com.project.taskmanager.controller;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-
+import com.project.taskmanager.dto.TaskDTO;
+import com.project.taskmanager.entity.Task;
+import com.project.taskmanager.mapper.TaskMapper;
+import com.project.taskmanager.service.TaskService;
 import jakarta.validation.Valid;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
@@ -18,12 +18,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.project.taskmanager.dto.TaskDTO;
-import com.project.taskmanager.entity.Task;
-import com.project.taskmanager.mapper.TaskMapper;
-import com.project.taskmanager.service.TaskService;
-
-import lombok.RequiredArgsConstructor;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
 
 @RequestMapping("/api/tasks")
 @RequiredArgsConstructor
@@ -44,7 +41,7 @@ public class TaskController {
 
     @PostMapping
     public ResponseEntity<Task> createTask(final Authentication authentication,
-            @Valid @RequestBody final TaskDTO taskDTO) throws URISyntaxException {
+                                           @Valid @RequestBody final TaskDTO taskDTO) throws URISyntaxException {
         final var principal = (User) authentication.getPrincipal();
         final var userId = principal.getUsername();
 
@@ -65,7 +62,7 @@ public class TaskController {
 
     @PutMapping("/{taskId}")
     public ResponseEntity<TaskDTO> updateTask(final Authentication authentication, @PathVariable final String taskId,
-            @RequestBody final TaskDTO taskDTO) {
+                                              @RequestBody final TaskDTO taskDTO) {
         final var principal = (User) authentication.getPrincipal();
         final var userId = principal.getUsername();
 

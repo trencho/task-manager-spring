@@ -1,23 +1,22 @@
 package com.project.taskmanager.controller;
 
+import com.project.taskmanager.dto.UserLoginDTO;
+import com.project.taskmanager.dto.UserRegistrationDTO;
+import com.project.taskmanager.mapper.UserMapper;
+import com.project.taskmanager.security.JwtTokenProvider;
+import com.project.taskmanager.service.UserService;
 import jakarta.validation.Valid;
-
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.project.taskmanager.dto.UserLoginDTO;
-import com.project.taskmanager.dto.UserRegistrationDTO;
-import com.project.taskmanager.mapper.UserMapper;
-import com.project.taskmanager.security.JwtTokenProvider;
-import com.project.taskmanager.service.UserService;
-
-import lombok.RequiredArgsConstructor;
 
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -41,13 +40,17 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody final UserLoginDTO userLoginDTO) {
-        final var authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(userLoginDTO.username(), userLoginDTO.password()));
+        try {
+            final var authentication = authenticationManager
+                    .authenticate(new UsernamePasswordAuthenticationToken(userLoginDTO.username(), userLoginDTO.password()));
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        final var jwt = tokenProvider.generateToken(authentication);
-        return ResponseEntity.ok(jwt);
+            final var jwt = tokenProvider.generateToken(authentication);
+            return ResponseEntity.ok(jwt);
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+        }
     }
 
 }

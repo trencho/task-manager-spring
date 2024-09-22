@@ -11,9 +11,7 @@ services:
       - 80
     image: task-manager-spring:latest
     networks:
-      network:
-        aliases:
-          - task-manager
+      - task-manager
     ports:
       - "80:80"
 
@@ -30,13 +28,14 @@ services:
       - 27017
     image: task-manager-mongo:latest
     networks:
-      - network
+      - task-manager
     ports:
       - "27017:27017"
     volumes:
       - ./docker/mongo/init/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
 
 networks:
-  network:
+  task-manager:
     attachable: true
     driver: overlay
+    external: true

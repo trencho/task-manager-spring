@@ -1,13 +1,12 @@
 package com.project.taskmanager.repository;
 
-import java.util.List;
-
+import com.project.taskmanager.entity.Task;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import com.project.taskmanager.entity.Task;
+import java.util.List;
 
 public interface TaskRepository extends MongoRepository<Task, String> {
 
-    List<Task> findByUserId(String userId);
+    List<Task> findByUsername(String username);
 
 }
