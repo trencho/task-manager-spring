@@ -10,16 +10,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
@@ -40,12 +42,16 @@ class TaskServiceImplTest {
 
     @Test
     void testGetAllTasks() {
-        when(taskRepository.findByUsername(USERNAME)).thenReturn(List.of());
+        final var tasks = List.of(new Task("Task 1", "Task 1 description", LocalDate.now(), TaskStatus.PENDING, USERNAME), new Task("Task 2", "Task 2 description", LocalDate.now(), TaskStatus.PENDING, USERNAME));
+        final var pageable = PageRequest.of(0, 5);
+        final var tasksPage = new PageImpl<>(tasks, pageable, 2);
 
-        final var tasks = taskService.getAllTasks(USERNAME);
-        assertNotNull(tasks);
-        assertTrue(tasks.isEmpty());
-        verify(taskRepository, times(1)).findByUsername(USERNAME);
+        when(taskRepository.findByUsername(USERNAME, pageable)).thenReturn(tasksPage);
+
+        final var result = taskService.getAllTasks(USERNAME, pageable);
+        assertThat(result.getContent()).hasSize(2);
+        assertThat(result.getTotalElements()).isEqualTo(2);
+        verify(taskRepository, times(1)).findByUsername(USERNAME, pageable);
     }
 
     @Test

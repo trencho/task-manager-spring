@@ -5,9 +5,9 @@ import com.project.taskmanager.exception.TaskNotFoundException;
 import com.project.taskmanager.repository.TaskRepository;
 import com.project.taskmanager.service.TaskService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -19,8 +19,8 @@ public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
 
     @Override
-    public List<Task> getAllTasks(final String userId) {
-        return taskRepository.findByUsername(userId);
+    public Page<Task> getAllTasks(final String userId, final Pageable pageable) {
+        return taskRepository.findByUsername(userId, pageable);
     }
 
     @Override

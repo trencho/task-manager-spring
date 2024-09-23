@@ -6,6 +6,8 @@ import com.project.taskmanager.mapper.TaskMapper;
 import com.project.taskmanager.service.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
@@ -32,11 +34,12 @@ public class TaskController {
     private final TaskMapper taskMapper;
 
     @GetMapping
-    public ResponseEntity<List<Task>> getAllTasks(final Authentication authentication) {
+    public ResponseEntity<Page<Task>> getAllTasks(final Authentication authentication,
+                                                  final Pageable pageable) {
         final var principal = (User) authentication.getPrincipal();
         final var userId = principal.getUsername();
 
-        return ResponseEntity.ok(taskService.getAllTasks(userId));
+        return ResponseEntity.ok(taskService.getAllTasks(userId, pageable));
     }
 
     @PostMapping

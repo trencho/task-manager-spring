@@ -1,12 +1,12 @@
 package com.project.taskmanager.service;
 
 import com.project.taskmanager.entity.Task;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface TaskService {
 
-    List<Task> getAllTasks(String userId);
+    Page<Task> getAllTasks(String userId, Pageable pageable);
 
     Task createTask(String userId, Task task);
 

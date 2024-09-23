@@ -73,11 +73,17 @@ class TaskControllerIntegrationTest {
         taskRepository.save(task1);
 
         mockMvc.perform(get(BASE_URL)
+                        .param("page", "0")
+                        .param("size", "10")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1))
-                .andExpect(jsonPath("$[0].title").value("Initial Task Title"))
-                .andExpect(jsonPath("$[0].description").value("Initial Task Description"));
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].title").value("Initial Task Title"))
+                .andExpect(jsonPath("$.content[0].description").value("Initial Task Description"))
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.totalPages").value(1))
+                .andExpect(jsonPath("$.size").value(10))
+                .andExpect(jsonPath("$.number").value(0));
     }
 
     @Test
