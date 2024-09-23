@@ -8,12 +8,12 @@ public interface TaskService {
 
     Page<Task> getAllTasks(String userId, Pageable pageable);
 
-    Task createTask(String userId, Task task);
+    Task createTask(Task task);
 
-    Task getTaskById(String userId, String id);
+    Task getTaskById(String username, String id);
 
-    Task updateTask(String userId, String id, Task task);
+    Task updateTask(String username, String id, Task task);
 
-    void deleteTask(String userId, String id);
+    void deleteTask(String username, String id);
 
 }

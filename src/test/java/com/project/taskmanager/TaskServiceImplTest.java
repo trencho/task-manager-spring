@@ -60,7 +60,7 @@ class TaskServiceImplTest {
 
         when(taskRepository.save(task)).thenReturn(task);
 
-        final var createdTask = taskService.createTask(USERNAME, task);
+        final var createdTask = taskService.createTask(task);
         assertNotNull(createdTask);
         assertEquals("Test Task", createdTask.getTitle());
 

@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
 
 @RequestMapping("/api/tasks")
 @RequiredArgsConstructor
@@ -46,9 +45,11 @@ public class TaskController {
     public ResponseEntity<Task> createTask(final Authentication authentication,
                                            @Valid @RequestBody final TaskDTO taskDTO) throws URISyntaxException {
         final var principal = (User) authentication.getPrincipal();
-        final var userId = principal.getUsername();
+        final var username = principal.getUsername();
 
-        final var createdTask = taskService.createTask(userId, taskMapper.toEntity(taskDTO));
+        final var task = taskMapper.toEntity(taskDTO);
+        task.setUsername(username);
+        final var createdTask = taskService.createTask(task);
         final var location = new URI("/api/tasks/" + createdTask.getId());
 
         return ResponseEntity.created(location).body(createdTask);

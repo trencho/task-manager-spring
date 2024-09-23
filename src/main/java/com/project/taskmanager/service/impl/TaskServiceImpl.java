@@ -19,31 +19,31 @@ public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
 
     @Override
-    public Page<Task> getAllTasks(final String userId, final Pageable pageable) {
-        return taskRepository.findByUsername(userId, pageable);
+    public Page<Task> getAllTasks(final String username, final Pageable pageable) {
+        return taskRepository.findByUsername(username, pageable);
     }
 
     @Override
-    public Task createTask(final String userId, final Task task) {
+    public Task createTask(final Task task) {
         return taskRepository.save(task);
     }
 
     @Override
-    public Task getTaskById(final String userId, final String id) {
+    public Task getTaskById(final String username, final String id) {
         final var task = taskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException(TASK_NOT_FOUND_WITH_ID + id));
-        if (task.getUsername().equals(userId)) {
+        if (task.getUsername().equals(username)) {
             return task;
         }
 
-        throw new TaskNotFoundException(TASK_NOT_FOUND_FOR_USER + userId);
+        throw new TaskNotFoundException(TASK_NOT_FOUND_FOR_USER + username);
     }
 
     @Override
-    public Task updateTask(final String userId, final String id, final Task task) {
+    public Task updateTask(final String username, final String id, final Task task) {
         final var existingTask = taskRepository.findById(id)
                 .orElseThrow(() -> new TaskNotFoundException(TASK_NOT_FOUND_WITH_ID + id));
 
-        if (existingTask.getUsername().equals(userId)) {
+        if (existingTask.getUsername().equals(username)) {
             existingTask.setTitle(task.getTitle());
             existingTask.setDescription(task.getDescription());
             existingTask.setDueDate(task.getDueDate());
@@ -52,19 +52,19 @@ public class TaskServiceImpl implements TaskService {
             return taskRepository.save(existingTask);
         }
 
-        throw new TaskNotFoundException(TASK_NOT_FOUND_FOR_USER + userId);
+        throw new TaskNotFoundException(TASK_NOT_FOUND_FOR_USER + username);
     }
 
     @Override
-    public void deleteTask(final String userId, final String id) {
+    public void deleteTask(final String username, final String id) {
         final var existingTask = taskRepository.findById(id)
                 .orElseThrow(() -> new TaskNotFoundException(TASK_NOT_FOUND_WITH_ID + id));
-        if (existingTask.getUsername().equals(userId)) {
+        if (existingTask.getUsername().equals(username)) {
             taskRepository.deleteById(id);
             return;
         }
 
-        throw new TaskNotFoundException(TASK_NOT_FOUND_FOR_USER + userId);
+        throw new TaskNotFoundException(TASK_NOT_FOUND_FOR_USER + username);
     }
 
 }
