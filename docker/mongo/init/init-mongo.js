@@ -2,7 +2,7 @@ db = db.getSiblingDB("task-manager");
 
 db.createUser({
     user: "admin",
-    pwd: "$2y$10$LGDcpci0mI.Jihj9FI1b1OzsDx7l.NgFJrgKECBNWPRY80qRb20fC",
+    pwd: "password",
     roles: [
         {
             role: "readWrite",
@@ -14,7 +14,7 @@ db.createUser({
 
 db.createUser({
     user: "username",
-    pwd: "$2y$10$LGDcpci0mI.Jihj9FI1b1OzsDx7l.NgFJrgKECBNWPRY80qRb20fC",
+    pwd: "password",
     roles: [
         {
             role: "readWrite",
@@ -27,7 +27,7 @@ db.createUser({
 db.createCollection("users");
 db.users.insertOne({
     username: "username",
-    password: "$2y$10$LGDcpci0mI.Jihj9FI1b1OzsDx7l.NgFJrgKECBNWPRY80qRb20fC",
+    password: "password",
     roles: ["USER"]
 });
 

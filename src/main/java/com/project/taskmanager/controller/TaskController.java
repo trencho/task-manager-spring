@@ -1,10 +1,12 @@
 package com.project.taskmanager.controller;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
+import com.project.taskmanager.dto.TaskDTO;
+import com.project.taskmanager.entity.Task;
+import com.project.taskmanager.enums.TaskStatus;
+import com.project.taskmanager.mapper.TaskMapper;
+import com.project.taskmanager.service.TaskService;
 import jakarta.validation.Valid;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -18,12 +20,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.project.taskmanager.dto.TaskDTO;
-import com.project.taskmanager.entity.Task;
-import com.project.taskmanager.mapper.TaskMapper;
-import com.project.taskmanager.service.TaskService;
-
-import lombok.RequiredArgsConstructor;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 @RequestMapping("/api/tasks")
 @RequiredArgsConstructor
@@ -36,15 +34,16 @@ public class TaskController {
 
     @GetMapping
     public ResponseEntity<Page<Task>> getAllTasks(@AuthenticationPrincipal(expression = "username") final String username,
-            final Pageable pageable) {
+                                                  final Pageable pageable) {
         return ResponseEntity.ok(taskService.getAllTasks(username, pageable));
     }
 
     @PostMapping
     public ResponseEntity<Task> createTask(@AuthenticationPrincipal(expression = "username") final String username,
-            @Valid @RequestBody final TaskDTO taskDTO) throws URISyntaxException {
+                                           @Valid @RequestBody final TaskDTO taskDTO) throws URISyntaxException {
         final var task = taskMapper.toEntity(taskDTO);
         task.setUsername(username);
+        task.setStatus(TaskStatus.PENDING);
         final var createdTask = taskService.createTask(task);
         final var location = new URI("/api/tasks/" + createdTask.getId());
 
@@ -53,22 +52,22 @@ public class TaskController {
 
     @GetMapping("/{taskId}")
     public ResponseEntity<TaskDTO> getTask(@AuthenticationPrincipal(expression = "username") final String username,
-            @PathVariable final String taskId) {
+                                           @PathVariable final String taskId) {
         final var task = taskService.getTaskById(username, taskId);
         return ResponseEntity.ok(taskMapper.toDTO(task));
     }
 
     @PutMapping("/{taskId}")
     public ResponseEntity<TaskDTO> updateTask(@AuthenticationPrincipal(expression = "username") final String username,
-            @PathVariable final String taskId,
-            @RequestBody final TaskDTO taskDTO) {
+                                              @PathVariable final String taskId,
+                                              @Valid @RequestBody final TaskDTO taskDTO) {
         final var task = taskService.updateTask(username, taskId, taskMapper.toEntity(taskDTO));
         return ResponseEntity.ok(taskMapper.toDTO(task));
     }
 
     @DeleteMapping("/{taskId}")
     public ResponseEntity<Void> deleteTask(@AuthenticationPrincipal(expression = "username") final String username,
-            @PathVariable final String taskId) {
+                                           @PathVariable final String taskId) {
         taskService.deleteTask(username, taskId);
         return ResponseEntity.noContent().build();
     }

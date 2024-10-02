@@ -1,7 +1,15 @@
 package com.project.taskmanager.controller;
 
+import com.project.taskmanager.dto.RefreshTokenRequestDTO;
+import com.project.taskmanager.dto.TokenResponseDTO;
+import com.project.taskmanager.dto.UserLoginDTO;
+import com.project.taskmanager.dto.UserRegistrationDTO;
+import com.project.taskmanager.mapper.UserMapper;
+import com.project.taskmanager.security.JwtTokenProvider;
+import com.project.taskmanager.service.RefreshTokenService;
+import com.project.taskmanager.service.UserService;
 import jakarta.validation.Valid;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,17 +20,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.project.taskmanager.dto.RefreshTokenRequestDTO;
-import com.project.taskmanager.dto.TokenResponseDTO;
-import com.project.taskmanager.dto.UserLoginDTO;
-import com.project.taskmanager.dto.UserRegistrationDTO;
-import com.project.taskmanager.mapper.UserMapper;
-import com.project.taskmanager.security.JwtTokenProvider;
-import com.project.taskmanager.service.RefreshTokenService;
-import com.project.taskmanager.service.UserService;
-
-import lombok.RequiredArgsConstructor;
 
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor

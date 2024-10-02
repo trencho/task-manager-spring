@@ -1,9 +1,8 @@
 package com.project.taskmanager.service;
 
+import com.project.taskmanager.entity.Task;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import com.project.taskmanager.entity.Task;
 
 public interface TaskService {
 

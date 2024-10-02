@@ -1,10 +1,9 @@
 package com.project.taskmanager.repository;
 
-import java.util.Optional;
-
+import com.project.taskmanager.entity.RefreshToken;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import com.project.taskmanager.entity.RefreshToken;
+import java.util.Optional;
 
 public interface RefreshTokenRepository extends MongoRepository<RefreshToken, String> {
 
