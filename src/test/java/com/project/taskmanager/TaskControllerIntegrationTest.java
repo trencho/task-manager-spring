@@ -1,23 +1,7 @@
 package com.project.taskmanager;
 
-import com.project.taskmanager.config.MongoTestContainerConfig;
-import com.project.taskmanager.entity.Task;
-import com.project.taskmanager.entity.User;
-import com.project.taskmanager.enums.TaskStatus;
-import com.project.taskmanager.repository.TaskRepository;
-import com.project.taskmanager.repository.UserRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
-
-import java.time.LocalDate;
-
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -25,6 +9,29 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.time.LocalDate;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+
+import com.project.taskmanager.config.MongoTestContainerConfig;
+import com.project.taskmanager.entity.Task;
+import com.project.taskmanager.entity.User;
+import com.project.taskmanager.enums.TaskStatus;
+import com.project.taskmanager.repository.TaskRepository;
+import com.project.taskmanager.repository.UserRepository;
+import com.project.taskmanager.security.CustomUserDetails;
 
 @AutoConfigureMockMvc
 @ContextConfiguration(classes = MongoTestContainerConfig.class)
@@ -64,6 +71,14 @@ class TaskControllerIntegrationTest {
         task.setStatus(TaskStatus.PENDING);
         task.setUsername(USERNAME);
         taskRepository.save(task);
+
+        final var authentication = mock(Authentication.class);
+        when(authentication.getPrincipal()).thenReturn(new CustomUserDetails(user));
+
+        final var securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+
+        SecurityContextHolder.setContext(securityContext);
     }
 
     @Test
@@ -80,10 +95,10 @@ class TaskControllerIntegrationTest {
                 .andExpect(jsonPath("$.content.length()").value(1))
                 .andExpect(jsonPath("$.content[0].title").value("Initial Task Title"))
                 .andExpect(jsonPath("$.content[0].description").value("Initial Task Description"))
-                .andExpect(jsonPath("$.totalElements").value(1))
-                .andExpect(jsonPath("$.totalPages").value(1))
-                .andExpect(jsonPath("$.size").value(10))
-                .andExpect(jsonPath("$.number").value(0));
+                .andExpect(jsonPath("$.page.totalElements").value(1))
+                .andExpect(jsonPath("$.page.totalPages").value(1))
+                .andExpect(jsonPath("$.page.size").value(10))
+                .andExpect(jsonPath("$.page.number").value(0));
     }
 
     @Test

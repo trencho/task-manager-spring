@@ -1,47 +1,59 @@
 package com.project.taskmanager.security;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.stereotype.Component;
-
 import java.util.Date;
 
+import jakarta.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import com.project.taskmanager.entity.RefreshToken;
+
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.extern.slf4j.Slf4j;
+
 @Component
-@RequiredArgsConstructor
 @Slf4j
 public class JwtTokenProvider {
 
-    private final UserDetailsService userDetailsService;
     @Value("${jwt.secret}")
     private String jwtSecret;
 
-    @Value("${jwt.expiration}")
-    private int jwtExpirationMs;
+    @Value("${jwt.accessTokenExpiration}")
+    private int accessTokenExpiration;
 
-    public String generateToken(final Authentication authentication) {
-        final var userDetails = (UserDetails) authentication.getPrincipal();
+    @Value("${jwt.refreshTokenExpiration}")
+    private long refreshTokenExpiration;
+
+    public String generateAccessToken(final String username) {
         final var now = new Date();
-        final var validity = new Date(now.getTime() + jwtExpirationMs);
+        final var validity = new Date(now.getTime() + accessTokenExpiration);
 
         return Jwts.builder()
-                .subject(userDetails.getUsername())
+                .subject(username)
                 .issuedAt(now)
                 .expiration(validity)
                 .signWith(SignatureAlgorithm.HS256, jwtSecret)
                 .compact();
     }
 
-    public Authentication getAuthentication(final String token) {
-        final var userDetails = userDetailsService.loadUserByUsername(getUsername(token));
-        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+    public RefreshToken generateRefreshToken(final String username) {
+        final var now = new Date();
+        final var expiryDate = new Date(now.getTime() + refreshTokenExpiration);
+
+        final var token = Jwts.builder()
+                .subject(username)
+                .issuedAt(now)
+                .expiration(expiryDate)
+                .signWith(SignatureAlgorithm.HS256, jwtSecret)
+                .compact();
+
+        return RefreshToken.builder()
+                .token(token)
+                .username(username)
+                .expiryDate(expiryDate.toInstant())
+                .build();
     }
 
     public String getUsername(final String token) {

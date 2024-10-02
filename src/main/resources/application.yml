@@ -9,7 +9,8 @@ spring:
 
 jwt:
   secret: 0a8aa3a72b3ac3b3c8e0a6dec37b22320fa0beb87200801f03cf70b6b9a53fa4
-  expiration: 3600000
+  accessTokenExpiration: 3600000
+  refreshTokenExpiration: 86400000
 
 server:
   port: 80

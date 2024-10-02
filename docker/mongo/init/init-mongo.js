@@ -1,8 +1,8 @@
-db = db.getSiblingDB("task-manager"); // Create or switch to the "task-manager" database
+db = db.getSiblingDB("task-manager");
 
 db.createUser({
     user: "admin",
-    pwd: "password", // replace with your password
+    pwd: "$2y$10$LGDcpci0mI.Jihj9FI1b1OzsDx7l.NgFJrgKECBNWPRY80qRb20fC",
     roles: [
         {
             role: "readWrite",
@@ -14,7 +14,7 @@ db.createUser({
 
 db.createUser({
     user: "username",
-    pwd: "password", // replace with your password
+    pwd: "$2y$10$LGDcpci0mI.Jihj9FI1b1OzsDx7l.NgFJrgKECBNWPRY80qRb20fC",
     roles: [
         {
             role: "readWrite",
@@ -24,27 +24,13 @@ db.createUser({
     mechanisms: ["SCRAM-SHA-256"]
 });
 
-// Create a "users" collection and insert a sample user
 db.createCollection("users");
 db.users.insertOne({
     username: "username",
-    password: "password",
+    password: "$2y$10$LGDcpci0mI.Jihj9FI1b1OzsDx7l.NgFJrgKECBNWPRY80qRb20fC",
     roles: ["USER"]
 });
 
-// Create a "tasks" collection and insert some sample tasks
 db.createCollection("tasks");
-db.tasks.insertMany([
-    {
-        title: "Task 1",
-        description: "Description for task 1",
-        completed: false
-    },
-    {
-        title: "Task 2",
-        description: "Description for task 2",
-        completed: true
-    }
-]);
 
 print("MongoDB initialization script executed successfully.");

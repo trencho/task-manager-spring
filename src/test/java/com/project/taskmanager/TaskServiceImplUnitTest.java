@@ -1,22 +1,5 @@
 package com.project.taskmanager;
 
-import com.project.taskmanager.entity.Task;
-import com.project.taskmanager.enums.TaskStatus;
-import com.project.taskmanager.exception.TaskNotFoundException;
-import com.project.taskmanager.repository.TaskRepository;
-import com.project.taskmanager.service.impl.TaskServiceImpl;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -29,8 +12,26 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+
+import com.project.taskmanager.entity.Task;
+import com.project.taskmanager.enums.TaskStatus;
+import com.project.taskmanager.exception.TaskNotFoundException;
+import com.project.taskmanager.repository.TaskRepository;
+import com.project.taskmanager.service.impl.TaskServiceImpl;
+
 @ExtendWith(MockitoExtension.class)
-class TaskServiceImplTest {
+class TaskServiceImplUnitTest {
 
     private static final String USERNAME = "username";
 
@@ -42,7 +43,8 @@ class TaskServiceImplTest {
 
     @Test
     void testGetAllTasks() {
-        final var tasks = List.of(new Task("Task 1", "Task 1 description", LocalDate.now(), TaskStatus.PENDING, USERNAME), new Task("Task 2", "Task 2 description", LocalDate.now(), TaskStatus.PENDING, USERNAME));
+        final var tasks = List.of(new Task("Task 1", "Task 1 description", LocalDate.now(), TaskStatus.PENDING, USERNAME),
+                new Task("Task 2", "Task 2 description", LocalDate.now(), TaskStatus.PENDING, USERNAME));
         final var pageable = PageRequest.of(0, 5);
         final var tasksPage = new PageImpl<>(tasks, pageable, 2);
 

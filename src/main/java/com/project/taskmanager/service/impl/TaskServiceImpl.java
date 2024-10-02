@@ -1,13 +1,15 @@
 package com.project.taskmanager.service.impl;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
 import com.project.taskmanager.entity.Task;
 import com.project.taskmanager.exception.TaskNotFoundException;
 import com.project.taskmanager.repository.TaskRepository;
 import com.project.taskmanager.service.TaskService;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service

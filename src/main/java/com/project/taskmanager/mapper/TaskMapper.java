@@ -1,8 +1,9 @@
 package com.project.taskmanager.mapper;
 
+import org.mapstruct.Mapper;
+
 import com.project.taskmanager.dto.TaskDTO;
 import com.project.taskmanager.entity.Task;
-import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface TaskMapper {

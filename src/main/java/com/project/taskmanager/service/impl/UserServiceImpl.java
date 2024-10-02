@@ -1,11 +1,13 @@
 package com.project.taskmanager.service.impl;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import com.project.taskmanager.entity.User;
 import com.project.taskmanager.repository.UserRepository;
 import com.project.taskmanager.service.UserService;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service

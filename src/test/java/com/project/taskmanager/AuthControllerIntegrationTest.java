@@ -1,12 +1,15 @@
 package com.project.taskmanager;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.taskmanager.dto.UserLoginDTO;
-import com.project.taskmanager.dto.UserRegistrationDTO;
-import com.project.taskmanager.entity.User;
-import com.project.taskmanager.mapper.UserMapper;
-import com.project.taskmanager.security.JwtTokenProvider;
-import com.project.taskmanager.service.UserService;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -19,13 +22,16 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.taskmanager.dto.RefreshTokenRequestDTO;
+import com.project.taskmanager.dto.UserLoginDTO;
+import com.project.taskmanager.dto.UserRegistrationDTO;
+import com.project.taskmanager.entity.RefreshToken;
+import com.project.taskmanager.entity.User;
+import com.project.taskmanager.mapper.UserMapper;
+import com.project.taskmanager.security.JwtTokenProvider;
+import com.project.taskmanager.service.RefreshTokenService;
+import com.project.taskmanager.service.UserService;
 
 @AutoConfigureMockMvc
 @SpringBootTest
@@ -36,6 +42,9 @@ class AuthControllerIntegrationTest {
 
     @MockBean
     private UserService userService;
+
+    @MockBean
+    private RefreshTokenService refreshTokenService;
 
     @MockBean
     private UserMapper userMapper;
@@ -89,17 +98,23 @@ class AuthControllerIntegrationTest {
     @Test
     void shouldLoginSuccessfully() throws Exception {
         final var userLoginDTO = new UserLoginDTO("username", "password");
+        final var accessTokenString = "mocked-jwt-token";
+        final var refreshTokenString = "mocked-refresh-token";
 
         final var authentication = mock(Authentication.class);
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenReturn(authentication);
-        when(tokenProvider.generateToken(any(Authentication.class))).thenReturn("mocked-jwt-token");
+        final var refreshToken = mock(RefreshToken.class);
+        when(tokenProvider.generateAccessToken(anyString())).thenReturn(accessTokenString);
+        when(refreshTokenService.createRefreshToken(anyString())).thenReturn(refreshToken);
+        when(refreshToken.getToken()).thenReturn(refreshTokenString);
 
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(userLoginDTO)))
                 .andExpect(status().isOk())
-                .andExpect(content().string("mocked-jwt-token"));
+                .andExpect(jsonPath("$.accessToken").value(accessTokenString))
+                .andExpect(jsonPath("$.refreshToken").value(refreshTokenString));
     }
 
     @Test
@@ -114,6 +129,34 @@ class AuthControllerIntegrationTest {
                         .content(asJsonString(userLoginDTO)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().string("Invalid credentials"));
+    }
+
+    @Test
+    void shouldReturnNewAccessTokenForValidRefreshToken() throws Exception {
+        final var refreshToken = "valid-refresh-token";
+        final var refreshTokenRequest = new RefreshTokenRequestDTO(refreshToken);
+        final var newAccessToken = "new-access-token";
+
+        when(refreshTokenService.refreshAccessToken(refreshToken)).thenReturn(newAccessToken);
+
+        mockMvc.perform(post("/api/auth/refresh-token")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(asJsonString(refreshTokenRequest)))
+                .andExpect(status().isOk())
+                .andExpect(content().string(newAccessToken));
+    }
+
+    @Test
+    void shouldReturnUnauthorizedForInvalidRefreshToken() throws Exception {
+        final var refreshToken = "invalid-refresh-token";
+        final var refreshTokenRequest = new RefreshTokenRequestDTO(refreshToken);
+
+        when(refreshTokenService.refreshAccessToken(refreshToken)).thenThrow(new RuntimeException("Refresh token not found"));
+
+        mockMvc.perform(post("/api/auth/refresh-token")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(asJsonString(refreshTokenRequest)))
+                .andExpect(status().isUnauthorized());
     }
 
 }

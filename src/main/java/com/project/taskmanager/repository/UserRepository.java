@@ -1,9 +1,10 @@
 package com.project.taskmanager.repository;
 
-import com.project.taskmanager.entity.User;
+import java.util.Optional;
+
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import java.util.Optional;
+import com.project.taskmanager.entity.User;
 
 public interface UserRepository extends MongoRepository<User, String> {
 
