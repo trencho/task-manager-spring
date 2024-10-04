@@ -3,7 +3,7 @@ spring:
     name: task-manager
   data:
     mongodb:
-      uri: mongodb://admin:password@localhost:27017/task-manager?authMechanism=SCRAM-SHA-256
+      uri: mongodb://admin:password@mongo:27017/task-manager?authMechanism=SCRAM-SHA-256
       database: task-manager
       authentication-database: task-manager
 
