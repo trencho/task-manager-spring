@@ -28,9 +28,8 @@ import java.net.URISyntaxException;
 @RestController
 public class TaskController {
 
-    private final TaskService taskService;
-
     private final TaskMapper taskMapper;
+    private final TaskService taskService;
 
     @GetMapping
     public ResponseEntity<Page<Task>> getAllTasks(@AuthenticationPrincipal(expression = "username") final String username,

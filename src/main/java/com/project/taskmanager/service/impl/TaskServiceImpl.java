@@ -30,11 +30,11 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public Task getTaskById(final String username, final String id) {
-        final var task = taskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException(TASK_NOT_FOUND_WITH_ID + id));
+        final var task = taskRepository.findById(id)
+                .orElseThrow(() -> new TaskNotFoundException(TASK_NOT_FOUND_WITH_ID + id));
         if (task.getUsername().equals(username)) {
             return task;
         }
-
         throw new TaskNotFoundException(TASK_NOT_FOUND_FOR_USER + username);
     }
 
@@ -51,7 +51,6 @@ public class TaskServiceImpl implements TaskService {
 
             return taskRepository.save(existingTask);
         }
-
         throw new TaskNotFoundException(TASK_NOT_FOUND_FOR_USER + username);
     }
 
@@ -63,7 +62,6 @@ public class TaskServiceImpl implements TaskService {
             taskRepository.deleteById(id);
             return;
         }
-
         throw new TaskNotFoundException(TASK_NOT_FOUND_FOR_USER + username);
     }
 

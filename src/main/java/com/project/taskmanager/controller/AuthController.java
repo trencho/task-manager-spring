@@ -26,6 +26,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class AuthController {
 
+    private static final String USER_REGISTERED_SUCCESSFULLY = "User registered successfully!";
+    private static final String INVALID_CREDENTIALS = "Invalid credentials";
+
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
     private final RefreshTokenService refreshTokenService;
@@ -36,7 +39,7 @@ public class AuthController {
     public ResponseEntity<?> register(@Valid @RequestBody final UserRegistrationDTO userRegistrationDTO) {
         try {
             userService.registerUser(userMapper.toEntity(userRegistrationDTO));
-            return ResponseEntity.ok("User registered successfully!");
+            return ResponseEntity.ok(USER_REGISTERED_SUCCESSFULLY);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -56,7 +59,7 @@ public class AuthController {
 
             return ResponseEntity.ok(new TokenResponseDTO(accessToken, refreshTokenEntity.getToken()));
         } catch (BadCredentialsException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(INVALID_CREDENTIALS);
         }
     }
 

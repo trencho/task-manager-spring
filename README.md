@@ -31,7 +31,7 @@ This is a RESTful API built with Spring Boot for managing tasks. It allows users
     - Maven
     - MongoDB
 2. Clone the repository:
-    - git clone https://github.com/your-username/task-manager-spring.git
+    - git clone https://github.com/trencho/task-manager-spring.git
 3. Configure application.yml:
     - Update the MongoDB connection URI (spring.data.mongodb.uri) with your database credentials.
     - Set a strong JWT secret key (jwt.secret).
@@ -57,7 +57,5 @@ This is a RESTful API built with Spring Boot for managing tasks. It allows users
 
 **Future Improvements**
 
-- Implement pagination for task lists.
 - Add search functionality to filter tasks.
 - Implement task priority levels.
-- Integrate with a frontend framework (e.g., React, Angular, Vue.js) to create a user interface.

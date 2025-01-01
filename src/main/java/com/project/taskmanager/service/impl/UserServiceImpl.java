@@ -16,12 +16,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void registerUser(final User user) {
-        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+        final var existingUser = userRepository.findByUsername(user.getUsername());
+        if (existingUser.isPresent()) {
             throw new IllegalArgumentException("User with the same username already exists");
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-
         userRepository.save(user);
     }
 
