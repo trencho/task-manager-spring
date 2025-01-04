@@ -18,3 +18,11 @@ server:
 logging:
   level:
     root: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, httptrace, info, metrics, openapi, prometheus, swagger-ui
+  server:
+    port: 9090
